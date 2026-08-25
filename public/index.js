@@ -39,6 +39,10 @@ form.addEventListener("submit", async (event) => {
 
 	try {
 		await registerSW();
+		if (!navigator.serviceWorker.controller) {
+			location.reload();
+			return;
+		}
 	} catch (err) {
 		error.textContent = "Failed to register service worker.";
 		errorCode.textContent = err.toString();
