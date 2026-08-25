@@ -32,7 +32,7 @@ const scramjet = new ScramjetController({
 
 scramjet.init();
 
-const connection = new BareMux.BareMuxConnection("baremux/worker.js");
+const connection = new BareMux.BareMuxConnection(new URL("baremux/worker.js", location.href).href);
 
 form.addEventListener("submit", async (event) => {
 	event.preventDefault();
@@ -48,8 +48,8 @@ form.addEventListener("submit", async (event) => {
 	const url = search(address.value, searchEngine.value);
 
 	let wispUrl = "wss://scramjet-app-plhs.onrender.com/wisp/";
-	if ((await connection.getTransport()) !== "libcurl/index.mjs") {
-		await connection.setTransport("libcurl/index.mjs", [
+	if ((await connection.getTransport()) !== new URL("libcurl/index.mjs", location.href).href) {
+		await connection.setTransport(new URL("libcurl/index.mjs", location.href).href, [
 			{ websocket: wispUrl },
 		]);
 	}
