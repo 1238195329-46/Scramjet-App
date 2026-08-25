@@ -130,3 +130,13 @@ h1 {
 #sj-error-code { color: var(--text-dim); font-size: 0.75rem; white-space: pre-wrap; max-width: 60ch; }
 
 footer { position: absolute; bottom: 18px; z-index: 2; color: var(--text-dim); font-size: 0.75rem; letter-spacing: 0.04em; }
+
+#sj-frame {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  z-index: 9999;
+  background: #fff;
+}
