@@ -25,9 +25,9 @@ const { ScramjetController } = $scramjetLoadController();
 const scramjet = new ScramjetController({
 	prefix: new URL("scramjet/", location.href).pathname,
 	files: {
-		wasm: "scram/scramjet.wasm.wasm",
-		all: "scram/scramjet.all.js",
-		sync: "scram/scramjet.sync.js",
+		wasm: new URL("scram/scramjet.wasm.wasm", location.href).pathname,
+		all: new URL("scram/scramjet.all.js", location.href).pathname,
+		sync: new URL("scram/scramjet.sync.js", location.href).pathname,
 	},
 });
 
