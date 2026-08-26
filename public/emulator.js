@@ -6,6 +6,7 @@
 var optionsSection = document.getElementById("options-section");
 var vmWrap = document.getElementById("vm-wrap");
 var vmStatus = document.getElementById("vm-status");
+var autosaveStatus = document.getElementById("autosave-status");
 var screenContainer = document.getElementById("screen_container");
 var scrollToOptionsBtn = document.getElementById("scroll-to-options");
 var scrollHint = document.getElementById("scroll-hint");
@@ -17,15 +18,25 @@ var uploadFilename = document.getElementById("upload-filename");
 var typeBtns = document.querySelectorAll(".type-btn");
 var bootUploadBtn = document.getElementById("boot-upload-btn");
 
+var rememberedPanel = document.getElementById("remembered-panel");
+var rememberedFilename = document.getElementById("remembered-filename");
+var bootRememberedBtn = document.getElementById("boot-remembered-btn");
+var forgetRememberedBtn = document.getElementById("forget-remembered-btn");
+
 var saveStateBtn = document.getElementById("save-state-btn");
 var loadStateBtn = document.getElementById("load-state-btn");
 var resetBtn = document.getElementById("reset-btn");
 var stopBtn = document.getElementById("stop-btn");
+var fullscreenBtn = document.getElementById("fullscreen-btn");
 
 var emulator = null;
 var pendingFile = null;
 var pendingSlot = "cdrom"; // "cdrom" or "hda"
 var STATE_DB_KEY = "cinder-emulator-state";
+var DISK_DB_KEY = "cinder-emulator-disk";
+var hasUnsavedChanges = false;
+var autosaveTimer = null;
+var AUTOSAVE_INTERVAL_MS = 60 * 1000;
 
 function setStatus(text) {
 vmStatus.textContent = text;
@@ -86,7 +97,53 @@ setSlot("cdrom");
 } else {
 setSlot("hda");
 }
+
+// Remember this file in IndexedDB so it doesn't need to be
+// re-uploaded on the next visit. Best-effort - if it fails (e.g.
+// storage quota), the upload still works for this session.
+idbPut(DISK_DB_KEY, { name: file.name, slot: pendingSlot, blob: file }).catch(
+function () {}
+);
 });
+
+// ---- remembered ISO (persisted upload from a previous visit) ----
+function checkRememberedDisk() {
+idbGet(DISK_DB_KEY)
+.then(function (saved) {
+if (!saved || !saved.blob) return;
+rememberedFilename.textContent = saved.name || "uploaded file";
+rememberedPanel.hidden = false;
+})
+.catch(function () {});
+}
+
+if (bootRememberedBtn) {
+bootRememberedBtn.addEventListener("click", function () {
+idbGet(DISK_DB_KEY)
+.then(function (saved) {
+if (!saved || !saved.blob) return;
+var options = {
+memory_size: 256 * 1024 * 1024,
+vga_memory_size: 8 * 1024 * 1024,
+};
+options[saved.slot || "cdrom"] = { buffer: saved.blob };
+bootVM(options);
+})
+.catch(function (err) {
+setStatus("Couldn't load remembered file: " + err.message);
+});
+});
+}
+
+if (forgetRememberedBtn) {
+forgetRememberedBtn.addEventListener("click", function () {
+idbDelete(DISK_DB_KEY)
+.then(function () {
+rememberedPanel.hidden = true;
+})
+.catch(function () {});
+});
+}
 
 function setSlot(slot) {
 pendingSlot = slot;
@@ -140,6 +197,9 @@ setStatus("Running");
 emulator.add_listener("emulator-loaded", function () {
 setStatus("Running");
 });
+
+hasUnsavedChanges = true;
+startAutosave();
 
 // v86 fails silently on a failed image/BIOS fetch (wrong URL, CORS
 // block, network error, etc.) unless this is wired up - without it,
@@ -210,6 +270,80 @@ reject(req.error);
 });
 }
 
+function idbDelete(key) {
+return openStateDB().then(function (db) {
+return new Promise(function (resolve, reject) {
+var tx = db.transaction(STATE_STORE, "readwrite");
+tx.objectStore(STATE_STORE).delete(key);
+tx.oncomplete = function () {
+resolve();
+};
+tx.onerror = function () {
+reject(tx.error);
+};
+});
+});
+}
+
+// ---- autosave (every 60s while a VM is running) ----
+function formatClock(date) {
+var h = date.getHours().toString().padStart(2, "0");
+var m = date.getMinutes().toString().padStart(2, "0");
+var s = date.getSeconds().toString().padStart(2, "0");
+return h + ":" + m + ":" + s;
+}
+
+function setAutosaveStatus(text) {
+if (!autosaveStatus) return;
+if (!text) {
+autosaveStatus.hidden = true;
+autosaveStatus.textContent = "";
+return;
+}
+autosaveStatus.hidden = false;
+autosaveStatus.textContent = text;
+}
+
+function doAutosave() {
+if (!emulator) return;
+emulator
+.save_state()
+.then(function (state) {
+return idbPut(STATE_DB_KEY, state);
+})
+.then(function () {
+hasUnsavedChanges = false;
+setAutosaveStatus("Auto-saved " + formatClock(new Date()));
+})
+.catch(function () {
+setAutosaveStatus("Auto-save failed");
+});
+}
+
+function startAutosave() {
+stopAutosave();
+// Tests can shorten the interval via window.__autosaveIntervalOverride
+// instead of waiting out the real 60s; unset in production.
+var interval = window.__autosaveIntervalOverride || AUTOSAVE_INTERVAL_MS;
+autosaveTimer = setInterval(doAutosave, interval);
+}
+
+function stopAutosave() {
+if (autosaveTimer) {
+clearInterval(autosaveTimer);
+autosaveTimer = null;
+}
+setAutosaveStatus(null);
+}
+
+// ---- warn before leaving with unsaved changes ----
+window.addEventListener("beforeunload", function (event) {
+if (!emulator || !hasUnsavedChanges) return;
+event.preventDefault();
+event.returnValue = "";
+return "";
+});
+
 // ---- toolbar ----
 saveStateBtn.addEventListener("click", function () {
 if (!emulator) return;
@@ -221,6 +355,8 @@ emulator
 return idbPut(STATE_DB_KEY, state);
 })
 .then(function () {
+hasUnsavedChanges = false;
+setAutosaveStatus("Auto-saved " + formatClock(new Date()));
 setStatus("State saved");
 })
 .catch(function (err) {
@@ -239,6 +375,7 @@ return;
 }
 // v86's restore_state() returns a Promise<void>.
 return emulator.restore_state(state).then(function () {
+hasUnsavedChanges = false;
 setStatus("Running");
 });
 })
@@ -258,11 +395,29 @@ if (!emulator) return;
 emulator.stop();
 emulator = null;
 pendingFile = null;
+hasUnsavedChanges = false;
+stopAutosave();
 fileInput.value = "";
 uploadPanel.hidden = true;
 showPicker();
 setStatus("Starting...");
 });
+
+// ---- fullscreen ----
+if (fullscreenBtn) {
+fullscreenBtn.addEventListener("click", function () {
+if (document.fullscreenElement) {
+document.exitFullscreen();
+} else if (screenContainer.requestFullscreen) {
+screenContainer.requestFullscreen();
+}
+});
+document.addEventListener("fullscreenchange", function () {
+fullscreenBtn.textContent = document.fullscreenElement
+? "Exit Fullscreen"
+: "Fullscreen";
+});
+}
 
 // ---- scroll navigation ----
 if (scrollToOptionsBtn) {
@@ -273,4 +428,6 @@ optionsSection.scrollIntoView({ behavior: "smooth", block: "start" });
 // Let first-time visitors know the screen is below the fold once a VM
 // exists to boot into (shown until the VM actually starts).
 if (scrollHint) scrollHint.hidden = false;
+
+checkRememberedDisk();
 })();

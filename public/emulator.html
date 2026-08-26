@@ -45,6 +45,17 @@ content="width=device-width, initial-scale=1.0, shrink-to-fit=no"
 <input type="file" id="file-input" accept=".iso,.img,.vhd,.qcow2" hidden />
 </div>
 
+<div id="remembered-panel" class="remembered-panel" hidden>
+<p class="remembered-label">Remembered from last time:</p>
+<div class="remembered-row">
+<span id="remembered-filename" class="remembered-filename"></span>
+<div class="remembered-actions">
+<button type="button" id="boot-remembered-btn" class="type-btn active">Boot this</button>
+<button type="button" id="forget-remembered-btn" class="type-btn">Forget</button>
+</div>
+</div>
+</div>
+
 <div id="upload-panel" class="upload-panel" hidden>
 <p id="upload-filename" class="upload-filename"></p>
 <p class="upload-hint">Is this a boot/install disc (CD), or a hard disk image?</p>
@@ -59,6 +70,11 @@ content="width=device-width, initial-scale=1.0, shrink-to-fit=no"
 Even within that range, performance depends on your device. Old
 software runs smoothly; anything demanding will be slow.
 </p>
+<p class="picker-note">
+Want Windows 7? Grab a copy from the
+<a href="https://archive.org/details/win-7-ult-sp1-english" target="_blank" rel="noopener noreferrer" class="get-win7-link">Internet Archive</a>
+(the x32 ISO runs better here), then use Upload your own above.
+</p>
 </div>
 
 <div id="scroll-hint" class="scroll-hint" hidden>&darr; Scroll down for the screen &darr;</div>
@@ -67,7 +83,9 @@ software runs smoothly; anything demanding will be slow.
 <div id="vm-wrap" class="vm-wrap" hidden>
 <div class="vm-toolbar">
 <span id="vm-status" class="vm-status">Starting&hellip;</span>
+<span id="autosave-status" class="autosave-status" hidden></span>
 <div class="vm-actions">
+<button type="button" id="fullscreen-btn" class="vm-btn">Fullscreen</button>
 <button type="button" id="save-state-btn" class="vm-btn">Save State</button>
 <button type="button" id="load-state-btn" class="vm-btn">Load State</button>
 <button type="button" id="reset-btn" class="vm-btn">Reset</button>
