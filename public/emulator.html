@@ -1,80 +1,85 @@
 ﻿<!doctype html>
 <html>
-	<head>
-		<meta charset="utf-8" />
-		<meta
-			name="viewport"
-			content="width=device-width, initial-scale=1.0, shrink-to-fit=no"
-		/>
-		<title>Cinder Emulator</title>
-		<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%94%A5%3C/text%3E%3C/svg%3E" />
-		<link rel="stylesheet" href="index.css" />
-		<link rel="stylesheet" href="emulator.css" />
-		<script src="v86/libv86.js"></script>
-	</head>
-	<body>
-		<div class="ember-glow ember-glow-1"></div>
-		<div class="ember-glow ember-glow-2"></div>
+<head>
+<meta charset="utf-8" />
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1.0, shrink-to-fit=no"
+/>
+<title>Cinder Emulator</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%94%A5%3C/text%3E%3C/svg%3E" />
+<link rel="stylesheet" href="index.css" />
+<link rel="stylesheet" href="emulator.css" />
+<script src="v86/libv86.js"></script>
+</head>
+<body>
+<a href="index.html" class="back-link">&larr; Back to Cinder</a>
+<button type="button" id="scroll-to-options" class="scroll-options-link" hidden>&uarr; Options</button>
 
-		<a href="index.html" class="back-link">&larr; Back to Cinder</a>
+<div id="options-section" class="options-section">
+<div class="ember-glow ember-glow-1"></div>
+<div class="ember-glow ember-glow-2"></div>
 
-		<div class="flex-center logo-wrapper header-center">
-			<h1>Emulator<span class="cursor">&nbsp;</span></h1>
-		</div>
-		<div class="flex-center desc left-margin">
-			<p>A real computer, simulated right in this tab. Pick something to boot.</p>
-		</div>
+<div class="flex-center logo-wrapper header-center">
+<h1>Emulator<span class="cursor">&nbsp;</span></h1>
+</div>
+<div class="flex-center desc left-margin">
+<p>A real computer, simulated right in this tab. Pick something to boot.</p>
+<p class="scope-note">Built for old DOS/Windows-era games and software &mdash; not modern titles or Steam. This is a real CPU running in software, with no graphics card access, so it has a hard ceiling on what it can run.</p>
+</div>
 
-		<div id="picker" class="picker">
-			<div class="boot-options">
-				<button type="button" class="boot-btn" data-preset="linux">
-					<strong>TinyCore Linux</strong>
-					<span>Small, fast, boots in seconds</span>
-				</button>
-				<button type="button" class="boot-btn" data-preset="freedos">
-					<strong>FreeDOS</strong>
-					<span>For old DOS games and software</span>
-				</button>
-				<button type="button" class="boot-btn" id="upload-trigger">
-					<strong>Upload your own</strong>
-					<span>.iso, .img, or .vhd - stays on your device</span>
-				</button>
-				<input type="file" id="file-input" accept=".iso,.img,.vhd,.qcow2" hidden />
-			</div>
+<div id="picker" class="picker">
+<div class="boot-options">
+<button type="button" class="boot-btn" data-preset="linux">
+<strong>TinyCore Linux</strong>
+<span>Small, fast, boots in seconds</span>
+</button>
+<button type="button" class="boot-btn" data-preset="freedos">
+<strong>FreeDOS</strong>
+<span>For old DOS games and software</span>
+</button>
+<button type="button" class="boot-btn" id="upload-trigger">
+<strong>Upload your own</strong>
+<span>.iso, .img, or .vhd &mdash; stays on your device</span>
+</button>
+<input type="file" id="file-input" accept=".iso,.img,.vhd,.qcow2" hidden />
+</div>
 
-			<div id="upload-panel" class="upload-panel" hidden>
-				<p id="upload-filename" class="upload-filename"></p>
-				<p class="upload-hint">Is this a boot/install disc (CD), or a hard disk image?</p>
-				<div class="upload-type-row">
-					<button type="button" class="type-btn active" data-slot="cdrom">CD-ROM (.iso)</button>
-					<button type="button" class="type-btn" data-slot="hda">Hard Disk (.img/.vhd)</button>
-				</div>
-				<button type="button" id="boot-upload-btn" class="boot-go-btn">Boot this</button>
-			</div>
+<div id="upload-panel" class="upload-panel" hidden>
+<p id="upload-filename" class="upload-filename"></p>
+<p class="upload-hint">Is this a boot/install disc (CD), or a hard disk image?</p>
+<div class="upload-type-row">
+<button type="button" class="type-btn active" data-slot="cdrom">CD-ROM (.iso)</button>
+<button type="button" class="type-btn" data-slot="hda">Hard Disk (.img/.vhd)</button>
+</div>
+<button type="button" id="boot-upload-btn" class="boot-go-btn">Boot this</button>
+</div>
 
-			<p class="picker-note">
-				Performance depends on your device - old software runs fine, modern
-				software will be slow or may not boot at all. That's a hard limit of
-				browser emulation, not a bug.
-			</p>
-		</div>
+<p class="picker-note">
+Even within that range, performance depends on your device. Old
+software runs smoothly; anything demanding will be slow.
+</p>
+</div>
 
-		<div id="vm-wrap" class="vm-wrap" hidden>
-			<div class="vm-toolbar">
-				<span id="vm-status" class="vm-status">Starting&hellip;</span>
-				<div class="vm-actions">
-					<button type="button" id="save-state-btn" class="vm-btn">Save State</button>
-					<button type="button" id="load-state-btn" class="vm-btn">Load State</button>
-					<button type="button" id="reset-btn" class="vm-btn">Reset</button>
-					<button type="button" id="stop-btn" class="vm-btn vm-btn-stop">Stop</button>
-				</div>
-			</div>
-			<div id="screen_container" class="screen_container">
-				<div id="screen"></div>
-				<canvas id="vga-canvas"></canvas>
-			</div>
-		</div>
+<div id="scroll-hint" class="scroll-hint" hidden>&darr; Scroll down for the screen &darr;</div>
+</div>
 
-		<script src="emulator.js" defer></script>
-	</body>
+<div id="vm-wrap" class="vm-wrap" hidden>
+<div class="vm-toolbar">
+<span id="vm-status" class="vm-status">Starting&hellip;</span>
+<div class="vm-actions">
+<button type="button" id="save-state-btn" class="vm-btn">Save State</button>
+<button type="button" id="load-state-btn" class="vm-btn">Load State</button>
+<button type="button" id="reset-btn" class="vm-btn">Reset</button>
+<button type="button" id="stop-btn" class="vm-btn vm-btn-stop">Stop</button>
+</div>
+</div>
+<div id="screen_container" class="screen_container">
+<div id="screen"></div>
+<canvas id="vga-canvas"></canvas>
+</div>
+</div>
+
+<script src="emulator.js" defer></script>
+</body>
 </html>

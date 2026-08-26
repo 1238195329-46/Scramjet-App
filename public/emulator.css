@@ -1,211 +1,285 @@
 ﻿/* emulator.css - matches Cinder's ember/fire theme */
 
 .back-link {
-	position: fixed;
-	top: 24px;
-	left: 24px;
-	color: var(--text-dim);
-	text-decoration: none;
-	font-size: 0.9rem;
-	border: 1px solid var(--border);
-	padding: 8px 14px;
-	border-radius: 8px;
-	background: var(--panel);
-	transition: color 0.15s, border-color 0.15s;
-	z-index: 5;
+position: fixed;
+top: 24px;
+left: 24px;
+color: var(--text-dim);
+text-decoration: none;
+font-size: 0.9rem;
+border: 1px solid var(--border);
+padding: 8px 14px;
+border-radius: 8px;
+background: var(--panel);
+transition: color 0.15s, border-color 0.15s;
+z-index: 5;
 }
 .back-link:hover {
-	color: var(--ember);
-	border-color: var(--border-hover);
+color: var(--ember);
+border-color: var(--border-hover);
+}
+
+.options-section {
+position: relative;
+min-height: 100vh;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+padding: 40px 0;
+box-sizing: border-box;
+}
+
+.scroll-options-link {
+position: fixed;
+top: 24px;
+right: 24px;
+color: var(--text-dim);
+font-size: 0.85rem;
+border: 1px solid var(--border);
+padding: 8px 14px;
+border-radius: 8px;
+background: var(--panel);
+cursor: pointer;
+transition: color 0.15s, border-color 0.15s;
+z-index: 10000;
+}
+.scroll-options-link:hover {
+color: var(--ember);
+border-color: var(--border-hover);
+}
+
+
+.scroll-hint {
+margin-top: 40px;
+font-size: 0.8rem;
+color: var(--text-dim);
+opacity: 0.7;
+}
+
+.scope-note {
+max-width: 480px;
+margin: 10px auto 0;
+font-size: 0.8rem;
+color: var(--text-dim);
+line-height: 1.5;
 }
 
 .picker {
-	max-width: 640px;
-	margin: 32px auto;
-	padding: 0 20px;
+max-width: 640px;
+margin: 32px auto;
+padding: 0 20px;
 }
 
 .boot-options {
-	display: grid;
-	grid-template-columns: 1fr 1fr;
-	gap: 14px;
-	margin-top: 8px;
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 14px;
+margin-top: 8px;
 }
 
 .boot-btn {
-	display: flex;
-	flex-direction: column;
-	align-items: flex-start;
-	gap: 4px;
-	background: var(--panel);
-	border: 1px solid var(--border);
-	border-radius: 10px;
-	padding: 16px 18px;
-	color: var(--text);
-	cursor: pointer;
-	text-align: left;
-	transition: border-color 0.15s, transform 0.1s, background 0.15s;
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+gap: 4px;
+background: var(--panel);
+border: 1px solid var(--border);
+border-radius: 10px;
+padding: 16px 18px;
+color: var(--text);
+cursor: pointer;
+text-align: left;
+transition: border-color 0.15s, transform 0.1s, background 0.15s;
 }
 .boot-btn:hover {
-	border-color: var(--border-hover);
-	background: var(--ember-soft);
-	transform: translateY(-1px);
+border-color: var(--border-hover);
+background: var(--ember-soft);
+transform: translateY(-1px);
 }
 .boot-btn strong {
-	font-size: 1rem;
-	color: var(--text);
+font-size: 1rem;
+color: var(--text);
 }
 .boot-btn span {
-	font-size: 0.82rem;
-	color: var(--text-dim);
+font-size: 0.82rem;
+color: var(--text-dim);
 }
 .boot-btn#upload-trigger {
-	grid-column: span 2;
+grid-column: span 2;
 }
 
 .upload-panel {
-	margin-top: 18px;
-	background: var(--panel);
-	border: 1px solid var(--border);
-	border-radius: 10px;
-	padding: 18px;
+margin-top: 18px;
+background: var(--panel);
+border: 1px solid var(--border);
+border-radius: 10px;
+padding: 18px;
 }
 .upload-filename {
-	font-size: 0.9rem;
-	color: var(--ember);
-	word-break: break-all;
-	margin: 0 0 10px;
+font-size: 0.9rem;
+color: var(--ember);
+word-break: break-all;
+margin: 0 0 10px;
 }
 .upload-hint {
-	font-size: 0.85rem;
-	color: var(--text-dim);
-	margin: 0 0 10px;
+font-size: 0.85rem;
+color: var(--text-dim);
+margin: 0 0 10px;
 }
 .upload-type-row {
-	display: flex;
-	gap: 10px;
-	margin-bottom: 14px;
+display: flex;
+gap: 10px;
+margin-bottom: 14px;
 }
 .type-btn {
-	flex: 1;
-	background: transparent;
-	border: 1px solid var(--border);
-	border-radius: 8px;
-	padding: 8px 10px;
-	color: var(--text-dim);
-	cursor: pointer;
-	font-size: 0.85rem;
-	transition: border-color 0.15s, color 0.15s, background 0.15s;
+flex: 1;
+background: transparent;
+border: 1px solid var(--border);
+border-radius: 8px;
+padding: 8px 10px;
+color: var(--text-dim);
+cursor: pointer;
+font-size: 0.85rem;
+transition: border-color 0.15s, color 0.15s, background 0.15s;
 }
 .type-btn.active {
-	border-color: var(--ember);
-	color: var(--ember);
-	background: var(--ember-soft);
+border-color: var(--ember);
+color: var(--ember);
+background: var(--ember-soft);
 }
 .boot-go-btn {
-	width: 100%;
-	background: var(--ember-dim);
-	border: 1px solid var(--ember);
-	border-radius: 8px;
-	padding: 10px;
-	color: #fff;
-	font-weight: 600;
-	cursor: pointer;
-	transition: background 0.15s;
+width: 100%;
+background: var(--ember-dim);
+border: 1px solid var(--ember);
+border-radius: 8px;
+padding: 10px;
+color: #fff;
+font-weight: 600;
+cursor: pointer;
+transition: background 0.15s;
 }
 .boot-go-btn:hover {
-	background: var(--ember);
+background: var(--ember);
 }
 
 .picker-note {
-	margin-top: 18px;
-	font-size: 0.8rem;
-	color: var(--text-dim);
-	line-height: 1.5;
+margin-top: 18px;
+font-size: 0.8rem;
+color: var(--text-dim);
+line-height: 1.5;
 }
 
 .vm-wrap {
-	max-width: 900px;
-	margin: 24px auto;
-	padding: 0 20px;
+min-height: 100vh;
+box-sizing: border-box;
+display: flex;
+flex-direction: column;
+padding: 16px 20px;
+}
+.vm-wrap[hidden] {
+display: none;
 }
 .vm-toolbar {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	margin-bottom: 10px;
-	flex-wrap: wrap;
-	gap: 10px;
+display: flex;
+align-items: center;
+justify-content: space-between;
+margin-bottom: 10px;
+flex-wrap: wrap;
+gap: 10px;
 }
 .vm-status {
-	font-size: 0.85rem;
-	color: var(--text-dim);
+font-size: 0.85rem;
+color: var(--text-dim);
 }
 .vm-actions {
-	display: flex;
-	gap: 8px;
-	flex-wrap: wrap;
+display: flex;
+gap: 8px;
+flex-wrap: wrap;
 }
 .vm-btn {
-	background: var(--panel);
-	border: 1px solid var(--border);
-	border-radius: 6px;
-	padding: 6px 12px;
-	color: var(--text);
-	font-size: 0.82rem;
-	cursor: pointer;
-	transition: border-color 0.15s, color 0.15s;
+background: var(--panel);
+border: 1px solid var(--border);
+border-radius: 6px;
+padding: 6px 12px;
+color: var(--text);
+font-size: 0.82rem;
+cursor: pointer;
+transition: border-color 0.15s, color 0.15s;
 }
 .vm-btn:hover {
-	border-color: var(--border-hover);
-	color: var(--ember);
+border-color: var(--border-hover);
+color: var(--ember);
 }
 .vm-btn-stop:hover {
-	border-color: #d9534f;
-	color: #d9534f;
+border-color: #d9534f;
+color: #d9534f;
 }
 
 .screen_container {
-	position: relative;
-	background: #000;
-	border: 1px solid var(--border);
-	border-radius: 10px;
-	overflow: auto;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	min-height: 400px;
+position: relative;
+background: #000;
+border: 1px solid var(--border);
+border-radius: 10px;
+overflow: auto;
+display: flex;
+align-items: center;
+justify-content: center;
+flex: 1 1 auto;
+min-height: 0;
 }
 .screen_container canvas,
 .screen_container div#screen {
-	image-rendering: pixelated;
+image-rendering: pixelated;
 }
 
 /* Emulator entry button on the Cinder home page */
 .emulator-link {
-	position: fixed;
-	top: 24px;
-	right: 24px;
-	color: var(--text-dim);
-	text-decoration: none;
-	font-size: 0.9rem;
-	border: 1px solid var(--border);
-	padding: 8px 14px;
-	border-radius: 8px;
-	background: var(--panel);
-	transition: color 0.15s, border-color 0.15s;
-	z-index: 5;
+position: fixed;
+top: 24px;
+right: 24px;
+color: var(--text-dim);
+text-decoration: none;
+font-size: 0.9rem;
+border: 1px solid var(--border);
+padding: 8px 14px;
+border-radius: 8px;
+background: var(--panel);
+transition: color 0.15s, border-color 0.15s;
+z-index: 5;
 }
 .emulator-link:hover {
-	color: var(--ember);
-	border-color: var(--border-hover);
+color: var(--ember);
+border-color: var(--border-hover);
+}
+
+/* Reload button - only shown while a proxied page is active, floats above
+   #sj-frame (z-index: 9999) so it stays clickable while browsing */
+.reload-link {
+position: fixed;
+top: 24px;
+right: 130px;
+color: var(--text-dim);
+font-size: 1.1rem;
+line-height: 1;
+border: 1px solid var(--border);
+padding: 7px 12px;
+border-radius: 8px;
+background: var(--panel);
+cursor: pointer;
+transition: color 0.15s, border-color 0.15s;
+z-index: 10000;
+}
+.reload-link:hover {
+color: var(--ember);
+border-color: var(--border-hover);
 }
 
 @media (max-width: 560px) {
-	.boot-options {
-		grid-template-columns: 1fr;
-	}
-	.boot-btn#upload-trigger {
-		grid-column: span 1;
-	}
+.boot-options {
+grid-template-columns: 1fr;
+}
+.boot-btn#upload-trigger {
+grid-column: span 1;
+}
 }
