@@ -543,6 +543,24 @@ fullscreenBtn.textContent = currentFSElement()
 );
 }
 
+// ---- mouse capture ----
+// v86 tracks the mouse as relative movement (like an old touchpad)
+// unless the browser's pointer is "locked" to the page - without this,
+// clicks land in the wrong spot and the cursor drifts out of sync with
+// what's on screen. Clicking the screen captures the mouse; the browser
+// shows its own "press Esc to exit" hint and releases it automatically.
+if (screenContainer) {
+screenContainer.addEventListener("click", function () {
+if (!emulator) return;
+if (document.pointerLockElement) return;
+if (typeof emulator.lock_mouse === "function") {
+emulator.lock_mouse();
+} else if (document.body.requestPointerLock) {
+document.body.requestPointerLock();
+}
+});
+}
+
 // ---- scroll navigation ----
 if (scrollToOptionsBtn) {
 scrollToOptionsBtn.addEventListener("click", function () {
