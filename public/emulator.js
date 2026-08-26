@@ -194,7 +194,7 @@ idbGet(DISK_DB_KEY)
 .then(function (saved) {
 if (!saved || !saved.blob) return;
 var options = {
-memory_size: 256 * 1024 * 1024,
+memory_size: 512 * 1024 * 1024,
 vga_memory_size: 8 * 1024 * 1024,
 };
 options[saved.slot || "cdrom"] = { buffer: saved.blob };
@@ -242,7 +242,7 @@ setSlot(b.getAttribute("data-slot"));
 bootUploadBtn.addEventListener("click", function () {
 if (!pendingFile) return;
 var options = {
-memory_size: 256 * 1024 * 1024,
+memory_size: 512 * 1024 * 1024,
 vga_memory_size: 8 * 1024 * 1024,
 };
 options[pendingSlot] = { buffer: pendingFile };
@@ -264,6 +264,11 @@ screen_container: screenContainer,
 bios: { url: "v86/seabios.bin" },
 vga_bios: { url: "v86/vgabios.bin" },
 autostart: true,
+// Windows Vista/7/8 require ACPI - without this, Windows Setup
+// fails with "Windows failed to load because the firmware
+// (BIOS) is not ACPI compatible" (0xc0000225) and loops back
+// to the install screen instead of completing.
+acpi: true,
 },
 diskConfig
 );
