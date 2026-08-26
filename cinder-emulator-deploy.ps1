@@ -64,7 +64,17 @@ if ($needBios) {
     Write-Host "   fetching BIOS files from the v86 repo..."
     $tmpRepo = Join-Path $env:TEMP "cinder-v86-repo"
     Remove-Item -Recurse -Force $tmpRepo -ErrorAction SilentlyContinue
-    git clone --depth 1 https://github.com/copy/v86.git $tmpRepo 2>&1 | Out-Null
+    # git writes its normal progress text to stderr, which PowerShell can treat as a
+    # thrown error under $ErrorActionPreference = "Stop". Run it as its own statement
+    # with errors temporarily relaxed so that progress chatter isn't mistaken for failure.
+    $prevEAP = $ErrorActionPreference
+    $ErrorActionPreference = "Continue"
+    git clone --depth 1 https://github.com/copy/v86.git $tmpRepo *> $null
+    $cloneExit = $LASTEXITCODE
+    $ErrorActionPreference = $prevEAP
+    if ($cloneExit -ne 0 -or -not (Test-Path (Join-Path $tmpRepo "bios\seabios.bin"))) {
+        throw "Couldn't clone the v86 repo for BIOS files. Check your internet connection and try again."
+    }
     Copy-Item (Join-Path $tmpRepo "bios\seabios.bin") (Join-Path $v86Dir "seabios.bin") -Force
     Copy-Item (Join-Path $tmpRepo "bios\vgabios.bin") (Join-Path $v86Dir "vgabios.bin") -Force
     Remove-Item -Recurse -Force $tmpRepo -ErrorAction SilentlyContinue
