@@ -15,6 +15,9 @@ content="width=device-width, initial-scale=1.0, shrink-to-fit=no"
 <script src="search.js" defer></script>
 <script src="index.js" defer></script>
 <script src="engine-picker.js" defer></script>
+<script src="quick-access.js" defer></script>
+<script src="tab-sync.js" defer></script>
+<script src="about-panel.js" defer></script>
 </head>
 <body>
 <div class="ember-glow ember-glow-1"></div>
@@ -27,7 +30,7 @@ content="width=device-width, initial-scale=1.0, shrink-to-fit=no"
 </div>
 <div class="flex-center desc left-margin">
 <p>
-Sorry about the captcha's and logins I know they are annyoying and im working on it.
+A private gateway to the open web. Type anything below to go there.
 </p>
 </div>
 <form id="sj-form" class="flex-center">
@@ -43,17 +46,51 @@ type="hidden"
 <p class="engine-hint">DuckDuckGo triggers far fewer captchas here.</p>
 <div class="input-wrap">
 <input id="sj-address" type="text" placeholder="Search or enter a URL" autocomplete="off" autofocus />
+<button type="button" id="sj-clear" class="clear-btn" hidden aria-label="Clear">&times;</button>
 <span id="sj-spinner" class="spinner" hidden></span>
 </div>
+<button type="button" id="sj-save" class="save-btn">&#9733; Save this link</button>
 </form>
+
+<div class="quick-access" id="quick-access">
+<p class="quick-access-label" id="quick-access-label" hidden>Quick Access</p>
+<div class="chip-row" id="chip-row"></div>
+</div>
+
 <div class="desc left-margin">
 <p id="sj-error"></p>
 <pre id="sj-error-code"></pre>
 </div>
+
 <footer>
 <div>
 <span>Cinder &copy; 2026</span>
+<button type="button" id="about-btn" class="about-btn">About &amp; Updates</button>
 </div>
 </footer>
+
+<div id="about-overlay" class="about-overlay" hidden>
+<div class="about-panel">
+<button type="button" id="about-close" class="about-close" aria-label="Close">&times;</button>
+<h2>About Cinder</h2>
+<p class="about-blurb">A private gateway to the open web. Type a site or search into the box on the home screen and it loads through here.</p>
+
+<h3>What's new</h3>
+<ul class="about-list">
+<li><span class="about-date">Aug 26</span>Added a search engine picker, Quick Access saved links, and tab icons that now match whatever site you're on.</li>
+<li><span class="about-date">Aug 25</span>New black and ember fire theme.</li>
+<li><span class="about-date">Aug 25</span>Renamed to Cinder.</li>
+</ul>
+
+<h3>Known issues</h3>
+<ul class="about-list">
+<li>Google can show repeat captchas. DuckDuckGo is far less picky — use the picker above the search box.</li>
+<li>Sign-ins using passkeys (some Microsoft accounts) can't work through here — that's a hard limit on their end.</li>
+<li>The backend server may restart briefly while it's moved to a better host soon.</li>
+</ul>
+
+<p class="about-version">v1.5</p>
+</div>
+</div>
 </body>
 </html>
