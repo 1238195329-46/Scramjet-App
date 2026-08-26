@@ -404,19 +404,53 @@ setStatus("Starting...");
 });
 
 // ---- fullscreen ----
+function requestFS(el) {
+if (el.requestFullscreen) return el.requestFullscreen();
+if (el.webkitRequestFullscreen) return el.webkitRequestFullscreen();
+if (el.msRequestFullscreen) return el.msRequestFullscreen();
+return Promise.reject(new Error("Fullscreen isn't supported in this browser"));
+}
+
+function exitFS() {
+if (document.exitFullscreen) return document.exitFullscreen();
+if (document.webkitExitFullscreen) return document.webkitExitFullscreen();
+if (document.msExitFullscreen) return document.msExitFullscreen();
+return Promise.resolve();
+}
+
+function currentFSElement() {
+return (
+document.fullscreenElement ||
+document.webkitFullscreenElement ||
+document.msFullscreenElement ||
+null
+);
+}
+
 if (fullscreenBtn) {
 fullscreenBtn.addEventListener("click", function () {
-if (document.fullscreenElement) {
-document.exitFullscreen();
-} else if (screenContainer.requestFullscreen) {
-screenContainer.requestFullscreen();
+if (currentFSElement()) {
+exitFS();
+return;
+}
+var req = requestFS(screenContainer);
+if (req && req.catch) {
+req.catch(function (err) {
+setStatus(
+"Fullscreen blocked: " + (err && err.message ? err.message : "try again")
+);
+});
 }
 });
-document.addEventListener("fullscreenchange", function () {
-fullscreenBtn.textContent = document.fullscreenElement
+["fullscreenchange", "webkitfullscreenchange", "msfullscreenchange"].forEach(
+function (evtName) {
+document.addEventListener(evtName, function () {
+fullscreenBtn.textContent = currentFSElement()
 ? "Exit Fullscreen"
 : "Fullscreen";
 });
+}
+);
 }
 
 // ---- scroll navigation ----
