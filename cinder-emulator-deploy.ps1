@@ -1,4 +1,4 @@
-# cinder-emulator-deploy.ps1  (v2 — verified/stable)
+# cinder-emulator-deploy.ps1  (v2 - verified/stable)
 # Adds the v86-based in-browser emulator to Cinder, with a top-right
 # "Emulator" button on the home page. Downloads the v86 engine files from
 # their official npm package + GitHub repo, writes the new emulator page/
@@ -116,7 +116,7 @@ Say "Writing public\emulator.html..."
 				</button>
 				<button type="button" class="boot-btn" id="upload-trigger">
 					<strong>Upload your own</strong>
-					<span>.iso, .img, or .vhd — stays on your device</span>
+					<span>.iso, .img, or .vhd - stays on your device</span>
 				</button>
 				<input type="file" id="file-input" accept=".iso,.img,.vhd,.qcow2" hidden />
 			</div>
@@ -132,7 +132,7 @@ Say "Writing public\emulator.html..."
 			</div>
 
 			<p class="picker-note">
-				Performance depends on your device — old software runs fine, modern
+				Performance depends on your device - old software runs fine, modern
 				software will be slow or may not boot at all. That's a hard limit of
 				browser emulation, not a bug.
 			</p>
@@ -163,7 +163,7 @@ Write-Host "   ok"
 # ---------------------------------------------------------------- emulator.css
 Say "Writing public\emulator.css..."
 @'
-/* emulator.css — matches Cinder's ember/fire theme */
+/* emulator.css - matches Cinder's ember/fire theme */
 
 .back-link {
 	position: fixed;
@@ -379,15 +379,15 @@ Write-Host "   ok"
 
 # ---------------------------------------------------------------- emulator.js
 # This is the version that was actually built and boot-tested against the real
-# v86 engine in a headless browser before shipping — including catching and
+# v86 engine in a headless browser before shipping - including catching and
 # fixing two real bugs: v86's save_state()/restore_state() are Promise-based
 # (not callback-based), and localStorage's ~5-10MB quota is far too small for
 # a VM snapshot, so state saving now goes through IndexedDB instead.
 Say "Writing public\emulator.js..."
 @'
-// emulator.js — wires up the v86 emulator page.
+// emulator.js - wires up the v86 emulator page.
 // Presets boot from copy.sh's public demo images (small, free, always up).
-// Uploaded files never leave the browser — v86 reads them locally via the File API.
+// Uploaded files never leave the browser - v86 reads them locally via the File API.
 
 (function () {
 	var picker = document.getElementById("picker");
@@ -493,7 +493,7 @@ Say "Writing public\emulator.js..."
 	// ---- boot ----
 	function bootVM(diskConfig) {
 		showVM();
-		setStatus("Starting…");
+		setStatus("Starting...");
 
 		var config = Object.assign(
 			{
@@ -521,7 +521,7 @@ Say "Writing public\emulator.js..."
 		});
 	}
 
-	// ---- state storage (IndexedDB — localStorage's ~5-10MB quota is far too
+	// ---- state storage (IndexedDB - localStorage's ~5-10MB quota is far too
 	// small for a VM snapshot, which is easily 30-300MB+ depending on RAM size) ----
 	var STATE_DB_NAME = "cinder-emulator-db";
 	var STATE_STORE = "states";
@@ -574,7 +574,7 @@ Say "Writing public\emulator.js..."
 	// ---- toolbar ----
 	saveStateBtn.addEventListener("click", function () {
 		if (!emulator) return;
-		setStatus("Saving state…");
+		setStatus("Saving state...");
 		// v86's save_state() returns a Promise<ArrayBuffer> (not a callback).
 		emulator
 			.save_state()
@@ -591,7 +591,7 @@ Say "Writing public\emulator.js..."
 
 	loadStateBtn.addEventListener("click", function () {
 		if (!emulator) return;
-		setStatus("Loading state…");
+		setStatus("Loading state...");
 		idbGet(STATE_DB_KEY)
 			.then(function (state) {
 				if (!state) {
@@ -622,7 +622,7 @@ Say "Writing public\emulator.js..."
 		fileInput.value = "";
 		uploadPanel.hidden = true;
 		showPicker();
-		setStatus("Starting…");
+		setStatus("Starting...");
 	});
 })();
 '@ | Set-Content -Path "public\emulator.js" -Encoding UTF8 -NoNewline
@@ -648,7 +648,7 @@ if ($idx -match '<ul class="about-list">\s*\r?\n\s*<li><span class="about-date">
         Write-Host "   changelog entry already present, skipping"
     }
 } else {
-    Write-Host "   (no matching about-list found to patch changelog into — skipped, not fatal)"
+    Write-Host "   (no matching about-list found to patch changelog into - skipped, not fatal)"
 }
 
 Set-Content -Path "public\index.html" -Value $idx -Encoding UTF8 -NoNewline
