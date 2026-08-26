@@ -43,6 +43,7 @@ content="width=device-width, initial-scale=1.0, shrink-to-fit=no"
 <span>.iso, .img, or .vhd &mdash; stays on your device</span>
 </button>
 <input type="file" id="file-input" accept=".iso,.img,.vhd,.qcow2" hidden />
+<input type="file" id="file-input-hda" accept=".iso,.img,.vhd,.qcow2" hidden />
 </div>
 
 <div id="remembered-panel" class="remembered-panel" hidden>
@@ -60,9 +61,26 @@ content="width=device-width, initial-scale=1.0, shrink-to-fit=no"
 <p id="upload-filename" class="upload-filename"></p>
 <p class="upload-hint">Is this a boot/install disc (CD), or a hard disk image?</p>
 <div class="upload-type-row">
-<button type="button" class="type-btn active" data-slot="cdrom">CD-ROM (.iso)</button>
-<button type="button" class="type-btn" data-slot="hda">Hard Disk (.img/.vhd)</button>
+<button type="button" class="type-btn slot-btn active" data-slot="cdrom">CD-ROM (.iso)</button>
+<button type="button" class="type-btn slot-btn" data-slot="hda">Hard Disk (.img/.vhd)</button>
 </div>
+
+<div id="hda-add-row" class="hda-add-row">
+<p class="upload-hint">
+Installing an OS (like Windows)? It needs a separate blank hard
+disk to install onto, or it will loop back to the install screen
+forever.
+</p>
+<div class="hda-choice-row">
+<button type="button" id="add-hda-btn" class="type-btn">Upload a disk file</button>
+<button type="button" id="create-hda-btn" class="type-btn">Create blank disk (1.5GB)</button>
+</div>
+<div id="hda-chosen-row" class="hda-chosen-row" hidden>
+<span id="hda-filename" class="hda-filename"></span>
+<button type="button" id="remove-hda-btn" class="hda-remove-btn">&times;</button>
+</div>
+</div>
+
 <button type="button" id="boot-upload-btn" class="boot-go-btn">Boot this</button>
 </div>
 

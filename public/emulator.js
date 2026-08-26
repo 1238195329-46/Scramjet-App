@@ -15,8 +15,15 @@ var uploadTrigger = document.getElementById("upload-trigger");
 var fileInput = document.getElementById("file-input");
 var uploadPanel = document.getElementById("upload-panel");
 var uploadFilename = document.getElementById("upload-filename");
-var typeBtns = document.querySelectorAll(".type-btn");
+var typeBtns = document.querySelectorAll(".slot-btn");
 var bootUploadBtn = document.getElementById("boot-upload-btn");
+
+var fileInputHda = document.getElementById("file-input-hda");
+var addHdaBtn = document.getElementById("add-hda-btn");
+var createHdaBtn = document.getElementById("create-hda-btn");
+var hdaChosenRow = document.getElementById("hda-chosen-row");
+var hdaFilename = document.getElementById("hda-filename");
+var removeHdaBtn = document.getElementById("remove-hda-btn");
 
 var rememberedPanel = document.getElementById("remembered-panel");
 var rememberedFilename = document.getElementById("remembered-filename");
@@ -32,6 +39,9 @@ var fullscreenBtn = document.getElementById("fullscreen-btn");
 var emulator = null;
 var pendingFile = null;
 var pendingSlot = "cdrom"; // "cdrom" or "hda"
+var pendingHdaFile = null; // separate hard disk, only used when pendingSlot is "cdrom"
+var pendingHdaName = null;
+var BLANK_HDA_BYTES = 1.5 * 1024 * 1024 * 1024; // 1.5GB - safe-ish ceiling for an in-tab ArrayBuffer
 var STATE_DB_KEY = "cinder-emulator-state";
 var DISK_DB_KEY = "cinder-emulator-disk";
 var hasUnsavedChanges = false;
@@ -83,6 +93,33 @@ uploadTrigger.addEventListener("click", function () {
 fileInput.click();
 });
 
+function clearHda() {
+pendingHdaFile = null;
+pendingHdaName = null;
+if (hdaChosenRow) hdaChosenRow.hidden = true;
+if (fileInputHda) fileInputHda.value = "";
+}
+
+function setHda(file, name) {
+pendingHdaFile = file;
+pendingHdaName = name;
+if (hdaFilename) hdaFilename.textContent = name;
+if (hdaChosenRow) hdaChosenRow.hidden = false;
+}
+
+function persistPending() {
+// Remember whatever is picked right now so it doesn't need to be
+// re-uploaded on the next visit. Best-effort - if it fails (e.g.
+// storage quota), the upload still works for this session.
+idbPut(DISK_DB_KEY, {
+name: pendingFile ? pendingFile.name : null,
+slot: pendingSlot,
+blob: pendingFile,
+hdaName: pendingHdaName,
+hdaBlob: pendingHdaFile,
+}).catch(function () {});
+}
+
 fileInput.addEventListener("change", function () {
 var file = fileInput.files && fileInput.files[0];
 if (!file) return;
@@ -96,22 +133,56 @@ if (lower.endsWith(".iso")) {
 setSlot("cdrom");
 } else {
 setSlot("hda");
+clearHda(); // hard disk is the primary file now, no second disk needed
 }
 
-// Remember this file in IndexedDB so it doesn't need to be
-// re-uploaded on the next visit. Best-effort - if it fails (e.g.
-// storage quota), the upload still works for this session.
-idbPut(DISK_DB_KEY, { name: file.name, slot: pendingSlot, blob: file }).catch(
-function () {}
-);
+persistPending();
 });
 
-// ---- remembered ISO (persisted upload from a previous visit) ----
+if (addHdaBtn && fileInputHda) {
+addHdaBtn.addEventListener("click", function () {
+fileInputHda.click();
+});
+fileInputHda.addEventListener("change", function () {
+var file = fileInputHda.files && fileInputHda.files[0];
+if (!file) return;
+setHda(file, file.name);
+persistPending();
+});
+}
+
+if (createHdaBtn) {
+createHdaBtn.addEventListener("click", function () {
+// A "blank" disk is just zeroed bytes - v86 accepts a plain
+// ArrayBuffer as the hda source, so this is created entirely in
+// the browser, no file or download needed.
+try {
+var blank = new ArrayBuffer(BLANK_HDA_BYTES);
+setHda(blank, "Blank disk (1.5GB)");
+persistPending();
+} catch (e) {
+setStatus("Couldn't create a blank disk in this browser: " + e.message);
+}
+});
+}
+
+if (removeHdaBtn) {
+removeHdaBtn.addEventListener("click", function () {
+clearHda();
+persistPending();
+});
+}
+
+// ---- remembered disk(s) (persisted upload from a previous visit) ----
 function checkRememberedDisk() {
 idbGet(DISK_DB_KEY)
 .then(function (saved) {
 if (!saved || !saved.blob) return;
-rememberedFilename.textContent = saved.name || "uploaded file";
+var label = saved.name || "uploaded file";
+if (saved.hdaBlob) {
+label += " + " + (saved.hdaName || "hard disk");
+}
+rememberedFilename.textContent = label;
 rememberedPanel.hidden = false;
 })
 .catch(function () {});
@@ -127,6 +198,9 @@ memory_size: 256 * 1024 * 1024,
 vga_memory_size: 8 * 1024 * 1024,
 };
 options[saved.slot || "cdrom"] = { buffer: saved.blob };
+if (saved.hdaBlob && (saved.slot || "cdrom") === "cdrom") {
+options.hda = { buffer: saved.hdaBlob };
+}
 bootVM(options);
 })
 .catch(function (err) {
@@ -150,6 +224,13 @@ pendingSlot = slot;
 typeBtns.forEach(function (b) {
 b.classList.toggle("active", b.getAttribute("data-slot") === slot);
 });
+var hdaAddRow = document.getElementById("hda-add-row");
+if (hdaAddRow) {
+// The "add a separate hard disk" option only makes sense when the
+// primary file is a CD-ROM (an install disc needs somewhere to
+// install to). If the primary file IS the hard disk, hide it.
+hdaAddRow.hidden = slot !== "cdrom";
+}
 }
 
 typeBtns.forEach(function (b) {
@@ -165,6 +246,9 @@ memory_size: 256 * 1024 * 1024,
 vga_memory_size: 8 * 1024 * 1024,
 };
 options[pendingSlot] = { buffer: pendingFile };
+if (pendingHdaFile && pendingSlot === "cdrom") {
+options.hda = { buffer: pendingHdaFile };
+}
 bootVM(options);
 });
 
@@ -395,6 +479,7 @@ if (!emulator) return;
 emulator.stop();
 emulator = null;
 pendingFile = null;
+clearHda();
 hasUnsavedChanges = false;
 stopAutosave();
 fileInput.value = "";

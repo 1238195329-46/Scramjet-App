@@ -215,6 +215,55 @@ transition: background 0.15s;
 background: var(--ember);
 }
 
+.hda-add-row {
+margin: 4px 0 14px;
+padding: 12px;
+background: var(--ember-soft);
+border: 1px solid var(--border);
+border-radius: 8px;
+}
+.hda-add-row .upload-hint {
+margin: 0 0 8px;
+}
+.hda-add-row .upload-hint:last-child {
+margin: 8px 0 0;
+}
+.hda-choice-row {
+display: flex;
+gap: 10px;
+}
+.hda-choice-row .type-btn {
+flex: 1;
+}
+.hda-chosen-row {
+display: flex;
+align-items: center;
+justify-content: space-between;
+gap: 10px;
+background: var(--panel);
+border: 1px solid var(--ember);
+border-radius: 8px;
+padding: 8px 12px;
+}
+.hda-filename {
+font-size: 0.85rem;
+color: var(--ember);
+word-break: break-all;
+}
+.hda-remove-btn {
+background: transparent;
+border: none;
+color: var(--text-dim);
+font-size: 1.1rem;
+line-height: 1;
+cursor: pointer;
+padding: 0 4px;
+flex-shrink: 0;
+}
+.hda-remove-btn:hover {
+color: var(--ember);
+}
+
 .picker-note {
 margin-top: 18px;
 font-size: 0.8rem;
