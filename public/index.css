@@ -140,3 +140,56 @@ footer { position: absolute; bottom: 18px; z-index: 2; color: var(--text-dim); f
   z-index: 9999;
   background: #fff;
 }
+
+.engine-toggle {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+.engine-btn {
+  padding: 0.4rem 1rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.engine-btn:hover {
+  border-color: var(--border-hover);
+  color: var(--text);
+}
+.engine-btn.active {
+  background: var(--ember-dim);
+  border-color: var(--ember);
+  color: var(--text);
+}
+.engine-hint {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  margin: 0 0 1rem;
+  text-align: center;
+}
+.input-wrap {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+.spinner {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--border);
+  border-top-color: var(--ember);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+.spinner[hidden] { display: none; }
+@keyframes spin { to { transform: translateY(-50%) rotate(360deg); } }
+#sj-address:disabled {
+  opacity: 0.6;
+}

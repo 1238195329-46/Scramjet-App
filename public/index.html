@@ -14,6 +14,7 @@ content="width=device-width, initial-scale=1.0, shrink-to-fit=no"
 <script src="register-sw.js" defer></script>
 <script src="search.js" defer></script>
 <script src="index.js" defer></script>
+<script src="engine-picker.js" defer></script>
 </head>
 <body>
 <div class="ember-glow ember-glow-1"></div>
@@ -35,7 +36,15 @@ id="sj-search-engine"
 value="https://duckduckgo.com/html/?q=%s"
 type="hidden"
 />
-<input id="sj-address" type="text" placeholder="Go anywhere" />
+<div class="engine-toggle" role="group" aria-label="Search engine">
+<button type="button" class="engine-btn active" data-engine="ddg" data-url="https://duckduckgo.com/html/?q=%s">DuckDuckGo</button>
+<button type="button" class="engine-btn" data-engine="google" data-url="https://www.google.com/search?q=%s">Google</button>
+</div>
+<p class="engine-hint">DuckDuckGo triggers far fewer captchas here.</p>
+<div class="input-wrap">
+<input id="sj-address" type="text" placeholder="Search or enter a URL" autocomplete="off" autofocus />
+<span id="sj-spinner" class="spinner" hidden></span>
+</div>
 </form>
 <div class="desc left-margin">
 <p id="sj-error"></p>
